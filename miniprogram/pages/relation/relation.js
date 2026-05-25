@@ -96,11 +96,10 @@ Page({
     
     this.setData({ isAnalyzing: true })
     
-    // 调用后端API进行分析
-    const apiUrl = app.globalData.apiBaseUrl + '/api/relation'
-    
-    wx.request({
-      url: apiUrl,
+    // 调用云函数进行分析
+    wx.cloud.callHTTPFunction({
+      name: 'mingpan-api',
+      path: '/api/relation',
       method: 'POST',
       data: {
         person1: {
@@ -119,28 +118,20 @@ Page({
         start_month: parseInt(startDate.split('-')[1])
       },
       success: (res) => {
-        if (res.statusCode === 200) {
-          this.setData({
-            analysisResult: res.data,
-            isAnalyzing: false
-          })
-          
-          wx.showToast({
-            title: '分析完成',
-            icon: 'success'
-          })
-        } else {
-          wx.showToast({
-            title: '分析失败',
-            icon: 'none'
-          })
-          this.setData({ isAnalyzing: false })
-        }
+        this.setData({
+          analysisResult: res.result || res.data,
+          isAnalyzing: false
+        })
+        
+        wx.showToast({
+          title: '分析完成',
+          icon: 'success'
+        })
       },
       fail: (err) => {
         console.error('分析失败:', err)
         wx.showToast({
-          title: '网络错误',
+          title: '分析失败，请重试',
           icon: 'none'
         })
         this.setData({ isAnalyzing: false })

@@ -110,11 +110,10 @@ Page({
     
     this.setData({ isSimulating: true })
     
-    // 调用后端API进行推演
-    const apiUrl = app.globalData.apiBaseUrl + '/api/simulate'
-    
-    wx.request({
-      url: apiUrl,
+    // 调用云函数进行推演
+    wx.cloud.callHTTPFunction({
+      name: 'mingpan-api',
+      path: '/api/simulate',
       method: 'POST',
       data: {
         agents: [{
@@ -130,30 +129,22 @@ Page({
         start_month: parseInt(startDate.split('-')[1])
       },
       success: (res) => {
-        if (res.statusCode === 200) {
-          // 预处理数据，格式化百分比等
-          const result = this.formatResult(res.data)
-          this.setData({
-            simulationResult: result,
-            isSimulating: false
-          })
-          
-          wx.showToast({
-            title: '推演完成',
-            icon: 'success'
-          })
-        } else {
-          wx.showToast({
-            title: '推演失败',
-            icon: 'none'
-          })
-          this.setData({ isSimulating: false })
-        }
+        // 预处理数据，格式化百分比等
+        const result = this.formatResult(res.result || res.data)
+        this.setData({
+          simulationResult: result,
+          isSimulating: false
+        })
+        
+        wx.showToast({
+          title: '推演完成',
+          icon: 'success'
+        })
       },
       fail: (err) => {
         console.error('推演失败:', err)
         wx.showToast({
-          title: '网络错误',
+          title: '推演失败，请重试',
           icon: 'none'
         })
         this.setData({ isSimulating: false })

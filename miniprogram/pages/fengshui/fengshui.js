@@ -71,33 +71,24 @@ Page({
       analyzing: true
     })
 
-    // 调用后端 API 进行风水分析
-    wx.request({
-      url: `${app.globalData.apiBaseUrl}/api/fengshui`,
+    // 调用云函数进行风水分析
+    wx.cloud.callHTTPFunction({
+      name: 'mingpan-api',
+      path: '/api/fengshui',
       method: 'POST',
       data: {
         location: this.data.location,
         timestamp: Date.now()
       },
-      header: {
-        'Content-Type': 'application/json'
-      },
       success: (res) => {
-        if (res.statusCode === 200) {
-          this.setData({
-            fengshuiData: res.data
-          })
-        } else {
-          wx.showToast({
-            title: '分析失败，请重试',
-            icon: 'none'
-          })
-        }
+        this.setData({
+          fengshuiData: res.result || res.data
+        })
       },
       fail: (err) => {
         console.error('风水分析请求失败:', err)
         wx.showToast({
-          title: '网络错误，请检查连接',
+          title: '分析失败，请重试',
           icon: 'none'
         })
       },

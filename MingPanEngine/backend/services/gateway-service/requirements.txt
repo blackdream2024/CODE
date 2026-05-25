@@ -1,0 +1,12 @@
+# API网关服务依赖
+
+# Web框架
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.2
+
+# HTTP客户端
+httpx==0.25.2
+
+# 工具库
+python-multipart==0.0.6

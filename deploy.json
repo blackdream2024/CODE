@@ -1,0 +1,1 @@
+{"action":"deploy","serverName":"mingpan-gateway","targetPath":"c:/Users/zhaoboyan/CodeBuddy/Claw/MingPanEngine/backend/services/gateway-service","serverConfig":{"OpenAccessTypes":["PUBLIC"],"Cpu":0.5,"Mem":1,"MinNum":1,"MaxNum":5}}

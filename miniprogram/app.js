@@ -4,7 +4,7 @@ App({
     // 初始化云开发
     if (wx.cloud) {
       wx.cloud.init({
-        env: 'test-1985-4gn0smgye6208976', // 云开发环境ID
+        env: 'cloud1-d5g6qt1jnd898a536', // 云开发环境ID
         traceUser: true
       })
     }
@@ -35,8 +35,6 @@ App({
     deviceInfo: null,
     appBaseInfo: null,
     isIphoneX: false,
-    userInfo: null,
-    // API 基础地址（需要替换为你的后端地址）
-    apiBaseUrl: 'http://localhost:8000'
+    userInfo: null
   }
 })
