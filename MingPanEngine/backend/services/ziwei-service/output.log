@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "c:\Users\zhaoboyan\CodeBuddy\Claw\MingPanEngine\backend\services\ziwei-service\main.py", line 17, in <module>
+    from ziwei_engine import calculate_ziwei, ZiWeiEngine
+  File "c:\Users\zhaoboyan\CodeBuddy\Claw\MingPanEngine\backend\services\ziwei-service\..\..\shared\utils\ziwei_engine.py", line 11, in <module>
+    from .calculation_process import create_ziwei_process
+ImportError: attempted relative import with no known parent package

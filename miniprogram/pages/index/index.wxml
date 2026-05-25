@@ -1,0 +1,64 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="bagua-border"></view>
+    <text class="title-gold">命理星河</text>
+    <text class="subtitle">星辰演化，命运可期</text>
+    <view class="huiwen-divider"></view>
+  </view>
+
+  <!-- 功能卡片区域 -->
+  <view class="content">
+    <!-- 命盘录入 -->
+    <view class="card" bindtap="goToChartInput">
+      <view class="card-header">
+        <text class="card-icon">📝</text>
+        <text class="card-title">命盘录入</text>
+      </view>
+      <text class="card-desc">录入出生信息，生成八字命盘</text>
+    </view>
+
+    <!-- 命盘查看 -->
+    <view class="card" bindtap="goToChartView">
+      <view class="card-header">
+        <text class="card-icon">🔮</text>
+        <text class="card-title">命盘查看</text>
+      </view>
+      <text class="card-desc">查看八字排盘、紫微斗数、五行分析</text>
+    </view>
+
+    <!-- 推演仿真 -->
+    <view class="card" bindtap="goToSimulation">
+      <view class="card-header">
+        <text class="card-icon">🎯</text>
+        <text class="card-title">推演仿真</text>
+      </view>
+      <text class="card-desc">基于OASIS多智能体社会仿真，输出概率云</text>
+    </view>
+
+    <!-- 关系分析 -->
+    <view class="card" bindtap="goToRelation">
+      <view class="card-header">
+        <text class="card-icon">💑</text>
+        <text class="card-title">关系分析</text>
+      </view>
+      <text class="card-desc">分析两人八字合婚、关系走势</text>
+    </view>
+
+    <!-- 风水分析 -->
+    <view class="card" bindtap="goToFengshui">
+      <view class="card-header">
+        <text class="card-icon">🏠</text>
+        <text class="card-title">风水分析</text>
+      </view>
+      <text class="card-desc">分析住宅风水格局、吉凶方位</text>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-text">命理星河 v1.0.0</text>
+    <text class="footer-text">星辰演化，命运可期</text>
+  </view>
+</view>

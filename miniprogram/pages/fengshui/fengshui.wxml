@@ -1,0 +1,89 @@
+<!--pages/fengshui/fengshui.wxml-->
+<view class="container">
+  <!-- 头部区域 -->
+  <view class="header">
+    <view class="header-icon">☯</view>
+    <text class="header-title">风水分析</text>
+    <text class="header-subtitle">方位气场·环境能量</text>
+  </view>
+
+  <!-- 位置信息区域 -->
+  <view class="section">
+    <view class="section-title">当前位置</view>
+    <view class="location-card">
+      <view class="location-info" wx:if="{{location}}">
+        <text class="location-text">经度: {{location.longitude}}</text>
+        <text class="location-text">纬度: {{location.latitude}}</text>
+        <text class="location-text" wx:if="{{location.address}}">地址: {{location.address}}</text>
+      </view>
+      <view class="location-empty" wx:else>
+        <text class="location-hint">点击获取位置信息</text>
+      </view>
+      <button class="location-btn" bindtap="getLocation" type="primary" size="mini">
+        {{location ? '重新定位' : '获取位置'}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 风水评分区域 -->
+  <view class="section" wx:if="{{fengshuiData}}">
+    <view class="section-title">风水评分</view>
+    <view class="score-card">
+      <view class="score-circle">
+        <text class="score-number">{{fengshuiData.score}}</text>
+        <text class="score-label">综合评分</text>
+      </view>
+      <view class="score-details">
+        <view class="score-item">
+          <text class="score-item-label">方位气场</text>
+          <text class="score-item-value">{{fengshuiData.directionScore}}</text>
+        </view>
+        <view class="score-item">
+          <text class="score-item-label">环境能量</text>
+          <text class="score-item-value">{{fengshuiData.environmentScore}}</text>
+        </view>
+        <view class="score-item">
+          <text class="score-item-label">时间运势</text>
+          <text class="score-item-value">{{fengshuiData.timeScore}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 方位分析区域 -->
+  <view class="section" wx:if="{{fengshuiData}}">
+    <view class="section-title">方位分析</view>
+    <view class="direction-card">
+      <view class="direction-grid">
+        <view class="direction-item" wx:for="{{fengshuiData.directions}}" wx:key="name">
+          <text class="direction-name">{{item.name}}</text>
+          <text class="direction-status {{item.status}}">{{item.statusText}}</text>
+          <text class="direction-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 风水建议区域 -->
+  <view class="section" wx:if="{{fengshuiData}}">
+    <view class="section-title">风水建议</view>
+    <view class="advice-card">
+      <view class="advice-list">
+        <view class="advice-item" wx:for="{{fengshuiData.advice}}" wx:key="index">
+          <view class="advice-icon">{{item.icon}}</view>
+          <view class="advice-content">
+            <text class="advice-title">{{item.title}}</text>
+            <text class="advice-text">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="action-btn" bindtap="analyzeFengshui" type="primary" disabled="{{!location}}">
+      {{analyzing ? '分析中...' : '开始风水分析'}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,181 @@
+<!--pages/simulation/simulation.wxml-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="bagua-border"></view>
+    <text class="title-gold">推演仿真</text>
+    <text class="subtitle">基于OASIS多智能体社会仿真，输出概率云</text>
+    <view class="huiwen-divider"></view>
+  </view>
+
+  <!-- 推演配置 -->
+  <view class="config-section">
+    <view class="section-title">
+      <text class="title">推演配置</text>
+    </view>
+
+    <!-- 命盘选择 -->
+    <view class="form-item">
+      <text class="form-label">选择命盘</text>
+      <picker mode="selector" range="{{chartNames}}" value="{{selectedChartIndex}}" bindchange="onChartSelect">
+        <view class="form-picker">
+          <text>{{chartNames[selectedChartIndex] || '请选择命盘'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 推演场景 -->
+    <view class="form-item">
+      <text class="form-label">推演场景</text>
+      <picker mode="selector" range="{{scenarioOptions}}" value="{{scenarioIndex}}" bindchange="onScenarioChange">
+        <view class="form-picker">
+          <text>{{scenarioOptions[scenarioIndex]}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 起始时间 -->
+    <view class="form-item">
+      <text class="form-label">起始时间</text>
+      <view class="time-picker">
+        <picker mode="date" value="{{startDate}}" start="2020-01-01" end="2100-12-31" bindchange="onStartDateChange">
+          <view class="form-picker">
+            <text>{{startDate || '选择日期'}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 仿真步数 -->
+    <view class="form-item">
+      <text class="form-label">仿真步数（月）</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="12" 
+        placeholder-style="color: #6a6a8a;"
+        value="{{steps}}"
+        bindinput="onStepsInput"
+      />
+    </view>
+
+    <!-- 采样次数 -->
+    <view class="form-item">
+      <text class="form-label">采样次数</text>
+      <input 
+        class="form-input" 
+        type="number" 
+        placeholder="50" 
+        placeholder-style="color: #6a6a8a;"
+        value="{{samples}}"
+        bindinput="onSamplesInput"
+      />
+    </view>
+
+    <!-- 开始推演按钮 -->
+    <button class="btn-primary" bindtap="onSimulate" disabled="{{!isFormValid || isSimulating}}">
+      {{isSimulating ? '推演中...' : '开始推演'}}
+    </button>
+  </view>
+
+  <!-- 推演结果 -->
+  <view class="result-section" wx:if="{{simulationResult}}">
+    <view class="section-title">
+      <text class="title">推演结果</text>
+    </view>
+
+    <!-- 统计卡片 -->
+    <view class="stat-grid">
+      <view class="stat-card">
+        <text class="stat-value">{{simulationResult.steps}}</text>
+        <text class="stat-label">仿真月数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{simulationResult.key_decisions.length}}</text>
+        <text class="stat-label">关键决策点</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{simulationResult.risk_level || '未知'}}</text>
+        <text class="stat-label">风险等级</text>
+      </view>
+    </view>
+
+    <!-- 风险分析 -->
+    <view class="info-card" wx:if="{{simulationResult.risk_analysis}}">
+      <view class="card-header">
+        <text class="card-icon">⚠️</text>
+        <text class="card-title">风险分析</text>
+      </view>
+      <view class="risk-grid">
+        <view class="risk-item">
+          <text class="risk-label">风险等级</text>
+          <text class="risk-value {{simulationResult.risk_analysis.risk_level === '高' ? 'risk-high' : simulationResult.risk_analysis.risk_level === '中' ? 'risk-medium' : 'risk-low'}}">
+            {{simulationResult.risk_analysis.risk_level || '未知'}}
+          </text>
+        </view>
+        <view class="risk-item">
+          <text class="risk-label">风险指数</text>
+          <text class="risk-value">{{simulationResult.risk_analysis.risk_score_percent || 'N/A'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 推演总结 -->
+    <view class="info-card" wx:if="{{simulationResult.summary}}">
+      <view class="card-header">
+        <text class="card-icon">📊</text>
+        <text class="card-title">推演总结</text>
+      </view>
+      <text class="summary-text">{{simulationResult.summary}}</text>
+    </view>
+
+    <!-- 关键决策点 -->
+    <view class="info-card" wx:if="{{simulationResult.key_decisions.length > 0}}">
+      <view class="card-header">
+        <text class="card-icon">🎯</text>
+        <text class="card-title">关键决策点</text>
+      </view>
+      <view class="decision-list">
+        <view class="decision-item" wx:for="{{simulationResult.key_decisions}}" wx:key="index">
+          <view class="decision-header">
+            <text class="decision-type {{item.type === 'peak' ? 'type-peak' : 'type-low'}}">
+              {{item.type === 'peak' ? '高峰' : '低谷'}}
+            </text>
+            <text class="decision-time">{{item.year}}年{{item.month}}月</text>
+          </view>
+          <text class="decision-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 专业建议 -->
+    <view class="info-card" wx:if="{{simulationResult.recommendations.length > 0}}">
+      <view class="card-header">
+        <text class="card-icon">💡</text>
+        <text class="card-title">专业建议</text>
+      </view>
+      <view class="recommendation-list">
+        <view class="recommendation-item" wx:for="{{simulationResult.recommendations}}" wx:key="index">
+          <text class="recommendation-index">{{index + 1}}</text>
+          <text class="recommendation-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isSimulating}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在运行推演仿真...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!simulationResult && !isSimulating}}">
+    <text class="empty-icon">🎯</text>
+    <text class="empty-text">暂无推演结果</text>
+    <text class="empty-desc">请先选择命盘并开始推演</text>
+  </view>
+</view>

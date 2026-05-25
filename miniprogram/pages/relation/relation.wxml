@@ -1,0 +1,165 @@
+<!--pages/relation/relation.wxml-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="bagua-border"></view>
+    <text class="title-gold">关系分析</text>
+    <text class="subtitle">分析两人八字合婚、关系走势</text>
+    <view class="huiwen-divider"></view>
+  </view>
+
+  <!-- 命盘选择区域 -->
+  <view class="chart-selection">
+    <view class="section-title">
+      <text class="title">选择命盘</text>
+    </view>
+
+    <!-- 第一个人 -->
+    <view class="form-item">
+      <text class="form-label">第一个人</text>
+      <picker mode="selector" range="{{chartNames}}" value="{{person1Index}}" bindchange="onPerson1Select">
+        <view class="form-picker">
+          <text>{{chartNames[person1Index] || '请选择命盘'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 第二个人 -->
+    <view class="form-item">
+      <text class="form-label">第二个人</text>
+      <picker mode="selector" range="{{chartNames}}" value="{{person2Index}}" bindchange="onPerson2Select">
+        <view class="form-picker">
+          <text>{{chartNames[person2Index] || '请选择命盘'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 起始时间 -->
+    <view class="form-item">
+      <text class="form-label">起始时间</text>
+      <picker mode="date" value="{{startDate}}" start="2020-01-01" end="2100-12-31" bindchange="onStartDateChange">
+        <view class="form-picker">
+          <text>{{startDate || '选择日期'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 分析按钮 -->
+    <button class="btn-primary" bindtap="onAnalyze" disabled="{{!isFormValid || isAnalyzing}}">
+      {{isAnalyzing ? '分析中...' : '开始分析'}}
+    </button>
+  </view>
+
+  <!-- 分析结果 -->
+  <view class="result-section" wx:if="{{analysisResult}}">
+    <view class="section-title">
+      <text class="title">分析结果</text>
+    </view>
+
+    <!-- 综合评分 -->
+    <view class="score-card">
+      <view class="score-header">
+        <text class="score-title">综合评分</text>
+        <text class="score-value">{{analysisResult.score || 0}}</text>
+      </view>
+      <view class="score-bar">
+        <view class="score-fill" style="width: {{analysisResult.score || 0}}%"></view>
+      </view>
+      <text class="score-desc">{{analysisResult.score_desc || ''}}</text>
+    </view>
+
+    <!-- 分析维度 -->
+    <view class="dimension-grid">
+      <view class="dimension-item" wx:for="{{analysisResult.dimensions}}" wx:key="name">
+        <text class="dimension-name">{{item.name}}</text>
+        <text class="dimension-value">{{item.value}}</text>
+      </view>
+    </view>
+
+    <!-- 关系特征 -->
+    <view class="info-card" wx:if="{{analysisResult.features.length > 0}}">
+      <view class="card-header">
+        <text class="card-icon">💑</text>
+        <text class="card-title">关系特征</text>
+      </view>
+      <view class="feature-list">
+        <view class="feature-item" wx:for="{{analysisResult.features}}" wx:key="index">
+          <text class="feature-icon">•</text>
+          <text class="feature-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 风险因素 -->
+    <view class="info-card" wx:if="{{analysisResult.risk_factors.length > 0}}">
+      <view class="card-header">
+        <text class="card-icon">⚠️</text>
+        <text class="card-title">风险因素</text>
+      </view>
+      <view class="risk-list">
+        <view class="risk-item" wx:for="{{analysisResult.risk_factors}}" wx:key="index">
+          <text class="risk-icon">•</text>
+          <text class="risk-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 改善建议 -->
+    <view class="info-card" wx:if="{{analysisResult.suggestions.length > 0}}">
+      <view class="card-header">
+        <text class="card-icon">💡</text>
+        <text class="card-title">改善建议</text>
+      </view>
+      <view class="suggestion-list">
+        <view class="suggestion-item" wx:for="{{analysisResult.suggestions}}" wx:key="index">
+          <text class="suggestion-index">{{index + 1}}</text>
+          <text class="suggestion-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 大运分析 -->
+    <view class="info-card" wx:if="{{analysisResult.dayun_analysis}}">
+      <view class="card-header">
+        <text class="card-icon">📅</text>
+        <text class="card-title">大运分析</text>
+      </view>
+      <view class="dayun-grid">
+        <view class="dayun-item" wx:for="{{analysisResult.dayun_analysis}}" wx:key="period">
+          <text class="dayun-period">{{item.period}}</text>
+          <text class="dayun-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 流年桃花分析 -->
+    <view class="info-card" wx:if="{{analysisResult.liunian_taohua}}">
+      <view class="card-header">
+        <text class="card-icon">🌸</text>
+        <text class="card-title">流年桃花分析</text>
+      </view>
+      <view class="taohua-grid">
+        <view class="taohua-item" wx:for="{{analysisResult.liunian_taohua}}" wx:key="year">
+          <text class="taohua-year">{{item.year}}</text>
+          <text class="taohua-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isAnalyzing}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在分析关系...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!analysisResult && !isAnalyzing}}">
+    <text class="empty-icon">💑</text>
+    <text class="empty-text">暂无分析结果</text>
+    <text class="empty-desc">请先选择两个命盘并开始分析</text>
+  </view>
+</view>

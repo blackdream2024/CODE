@@ -1,0 +1,132 @@
+<!--pages/chart-view/chart-view.wxml-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="bagua-border"></view>
+    <text class="title-gold">命盘查看</text>
+    <text class="subtitle">查看八字排盘、紫微斗数、五行分析</text>
+    <view class="huiwen-divider"></view>
+  </view>
+
+  <!-- 命盘选择区域 -->
+  <view class="chart-selector">
+    <text class="selector-label">选择命盘</text>
+    <picker mode="selector" range="{{chartNames}}" value="{{selectedChartIndex}}" bindchange="onChartSelect">
+      <view class="selector-picker">
+        <text>{{chartNames[selectedChartIndex] || '请选择命盘'}}</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 命盘详情 -->
+  <view class="chart-detail" wx:if="{{selectedChart}}">
+    <!-- 基本信息 -->
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-icon">👤</text>
+        <text class="card-title">基本信息</text>
+      </view>
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="info-label">姓名</text>
+          <text class="info-value">{{selectedChart.name}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">性别</text>
+          <text class="info-value">{{selectedChart.gender === 'male' ? '男' : '女'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">出生日期</text>
+          <text class="info-value">{{selectedChart.birth_date}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">出生时间</text>
+          <text class="info-value">{{selectedChart.birth_time}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">历法</text>
+          <text class="info-value">{{selectedChart.calendar}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">出生地</text>
+          <text class="info-value">{{selectedChart.birth_place || '未填写'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 八字排盘 -->
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-icon">🔮</text>
+        <text class="card-title">八字排盘</text>
+      </view>
+      <view class="bazi-grid">
+        <view class="bazi-column">
+          <text class="bazi-label">年柱</text>
+          <text class="bazi-value">{{baziData.year}}</text>
+        </view>
+        <view class="bazi-column">
+          <text class="bazi-label">月柱</text>
+          <text class="bazi-value">{{baziData.month}}</text>
+        </view>
+        <view class="bazi-column">
+          <text class="bazi-label">日柱</text>
+          <text class="bazi-value">{{baziData.day}}</text>
+        </view>
+        <view class="bazi-column">
+          <text class="bazi-label">时柱</text>
+          <text class="bazi-value">{{baziData.hour}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 五行分析 -->
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-icon">🌊</text>
+        <text class="card-title">五行分析</text>
+      </view>
+      <view class="wuxing-grid">
+        <view class="wuxing-item" wx:for="{{wuxingData}}" wx:key="element">
+          <text class="wuxing-element">{{item.element}}</text>
+          <text class="wuxing-strength">{{item.strength}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 十神分析 -->
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-icon">⭐</text>
+        <text class="card-title">十神分析</text>
+      </view>
+      <view class="shishen-grid">
+        <view class="shishen-item" wx:for="{{shishenData}}" wx:key="name">
+          <text class="shishen-name">{{item.name}}</text>
+          <text class="shishen-value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="btn-secondary" bindtap="goToSimulation">
+        推演仿真
+      </button>
+      <button class="btn-primary" bindtap="goToRelation">
+        关系分析
+      </button>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!selectedChart}}">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">暂无命盘数据</text>
+    <text class="empty-desc">请先在"录入"页面添加命盘</text>
+    <button class="btn-primary" bindtap="goToChartInput">
+      去录入命盘
+    </button>
+  </view>
+</view>

@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/chart-input/chart-input",
+    "pages/chart-view/chart-view",
+    "pages/simulation/simulation",
+    "pages/relation/relation",
+    "pages/fengshui/fengshui"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#0a0a1a",
+    "navigationBarTitleText": "命理星河",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a0a1a"
+  },
+  "tabBar": {
+    "color": "#b8b8d0",
+    "selectedColor": "#d4a853",
+    "backgroundColor": "#141430",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "总览"
+      },
+      {
+        "pagePath": "pages/chart-input/chart-input",
+        "text": "录入"
+      },
+      {
+        "pagePath": "pages/chart-view/chart-view",
+        "text": "查看"
+      },
+      {
+        "pagePath": "pages/simulation/simulation",
+        "text": "推演"
+      },
+      {
+        "pagePath": "pages/relation/relation",
+        "text": "关系"
+      }
+    ]
+  },
+  "cloud": true,
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于风水分析"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

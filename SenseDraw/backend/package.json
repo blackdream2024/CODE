@@ -1,0 +1,18 @@
+{
+  "name": "sensedraw-backend",
+  "version": "1.0.0",
+  "description": "SenseDraw 智能系统图生成器后端服务",
+  "main": "u1-pipeline-server.js",
+  "scripts": {
+    "start": "node u1-pipeline-server.js",
+    "dev": "nodemon u1-pipeline-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

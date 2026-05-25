@@ -1,0 +1,105 @@
+<!--pages/chart-input/chart-input.wxml-->
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <view class="bagua-border"></view>
+    <text class="title-gold">命盘录入</text>
+    <text class="subtitle">录入出生信息，生成八字命盘</text>
+    <view class="huiwen-divider"></view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-container">
+    <!-- 姓名 -->
+    <view class="form-item">
+      <text class="form-label">姓名</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入姓名" 
+        placeholder-style="color: #6a6a8a;"
+        value="{{name}}"
+        bindinput="onNameInput"
+      />
+    </view>
+
+    <!-- 性别 -->
+    <view class="form-item">
+      <text class="form-label">性别</text>
+      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+        <view class="form-picker">
+          <text>{{genderOptions[genderIndex]}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 出生日期 -->
+    <view class="form-item">
+      <text class="form-label">出生日期</text>
+      <picker mode="date" value="{{birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
+        <view class="form-picker">
+          <text>{{birthDate || '请选择出生日期'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 出生时间 -->
+    <view class="form-item">
+      <text class="form-label">出生时间</text>
+      <picker mode="time" value="{{birthTime}}" bindchange="onTimeChange">
+        <view class="form-picker">
+          <text>{{birthTime || '请选择出生时间'}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 出生地点 -->
+    <view class="form-item">
+      <text class="form-label">出生地点</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入出生地点" 
+        placeholder-style="color: #6a6a8a;"
+        value="{{birthPlace}}"
+        bindinput="onPlaceInput"
+      />
+    </view>
+
+    <!-- 农历/公历选择 -->
+    <view class="form-item">
+      <text class="form-label">历法</text>
+      <picker mode="selector" range="{{calendarOptions}}" value="{{calendarIndex}}" bindchange="onCalendarChange">
+        <view class="form-picker">
+          <text>{{calendarOptions[calendarIndex]}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="btn-primary" bindtap="onSubmit" disabled="{{!isFormValid}}">
+      生成命盘
+    </button>
+
+    <!-- 已录入命盘列表 -->
+    <view class="chart-list" wx:if="{{charts.length > 0}}">
+      <view class="section-title">
+        <text class="title">已录入命盘</text>
+        <text class="count">共 {{charts.length}} 个</text>
+      </view>
+      
+      <view class="chart-item" wx:for="{{charts}}" wx:key="id">
+        <view class="chart-info">
+          <text class="chart-name">{{item.name}}</text>
+          <text class="chart-detail">{{item.birth_date}} {{item.birth_time}}</text>
+        </view>
+        <view class="chart-actions">
+          <text class="action-btn view" bindtap="viewChart" data-id="{{item.id}}">查看</text>
+          <text class="action-btn delete" bindtap="deleteChart" data-id="{{item.id}}">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

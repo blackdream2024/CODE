@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统图工具 - 智能架构图生成器</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- PDF.js 库用于解析 PDF 文件 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="logo">
+        <h1>⚡ 系统图工具</h1>
+        <p>AI 智能架构图生成</p>
+      </div>
+      
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-page="home">
+          <span class="icon">🏠</span>
+          <span>首页</span>
+        </a>
+        <a href="#" class="nav-item" data-page="create">
+          <span class="icon">🚀</span>
+          <span>创建任务</span>
+        </a>
+        <a href="#" class="nav-item" data-page="history">
+          <span class="icon">📁</span>
+          <span>历史记录</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <!-- API 使用情况 -->
+        <div class="api-usage-card">
+          <div class="api-usage-header">
+            <span class="api-usage-icon">📊</span>
+            <span class="api-usage-title">API 调用限制</span>
+          </div>
+          <div class="api-usage-info">
+            <div class="api-usage-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="apiProgressFill" style="width: 0%"></div>
+              </div>
+              <span class="progress-text" id="apiProgressText">0/1500</span>
+            </div>
+            <div class="api-usage-details">
+              <span class="api-usage-remaining" id="apiRemaining">剩余: 1500</span>
+              <span class="api-usage-reset" id="apiResetTime">重置时间: --</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stats-card">
+          <span class="label">今日生成</span>
+          <span class="value" id="statToday">0</span>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 首页 -->
+      <section class="page" id="page-home">
+        <div class="page-header">
+          <h2>欢迎使用系统图工具</h2>
+          <p>基于 SenseNova AI 的智能架构图生成平台</p>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-info">
+              <span class="stat-label">总生成数</span>
+              <span class="stat-value" id="statTotal">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-info">
+              <span class="stat-label">文生图</span>
+              <span class="stat-value" id="statText">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔬</div>
+            <div class="stat-info">
+              <span class="stat-label">图生图</span>
+              <span class="stat-value" id="statImage">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="recent-section">
+          <h3>最近生成</h3>
+          <div class="recent-list" id="recentList">
+            <div class="empty-state">暂无生成记录</div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 创建任务页 -->
+      <section class="page" id="page-create" style="display: none;">
+        <div class="page-header">
+          <h2>创建生成任务</h2>
+          <p>选择模式，输入描述生成系统图</p>
+        </div>
+        
+        <form id="createForm" class="create-form">
+          <!-- 模式选择 -->
+          <div class="form-section">
+            <h3>模式选择</h3>
+            <div class="mode-selector">
+              <label class="mode-option active">
+                <input type="radio" name="mode" value="text_to_image" checked>
+                <div class="mode-card">
+                  <span class="mode-icon">💬</span>
+                  <span class="mode-name">文生图</span>
+                  <span class="mode-desc">输入文字描述生成图像</span>
+                </div>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="mode" value="image_to_image">
+                <div class="mode-card">
+                  <span class="mode-icon">🔬</span>
+                  <span class="mode-name">图生图</span>
+                  <span class="mode-desc">AI 分析后精准还原</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 图生图模式选项 -->
+          <div class="form-section" id="imageModeSection" style="display: none;">
+            <h3>图生图模式</h3>
+            <div class="mode-selector">
+              <label class="mode-option active">
+                <input type="radio" name="imageMode" value="exact" checked>
+                <div class="mode-card">
+                  <span class="mode-icon">🎯</span>
+                  <span class="mode-name">精准还原</span>
+                  <span class="mode-desc">只优化效果，不增减内容</span>
+                </div>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="imageMode" value="extend">
+                <div class="mode-card">
+                  <span class="mode-icon">🚀</span>
+                  <span class="mode-name">延展发挥</span>
+                  <span class="mode-desc">基于原图创意扩展</span>
+                </div>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="imageMode" value="structure_locked">
+                <div class="mode-card">
+                  <span class="mode-icon">🔒</span>
+                  <span class="mode-name">结构锁定</span>
+                  <span class="mode-desc">坐标精确，只优化视觉风格</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 图片上传（图生图模式） -->
+          <div class="form-section" id="imageUploadSection" style="display: none;">
+            <h3>参考图片</h3>
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-placeholder">
+                <span class="upload-icon">📷</span>
+                <span class="upload-text">点击或拖拽上传图片</span>
+                <span class="upload-hint">支持 JPG、PNG 格式</span>
+              </div>
+              <input type="file" id="imageFile" accept="image/*" style="display: none;">
+              <input type="text" id="imageUrl" class="url-input" placeholder="或输入图片 URL">
+            </div>
+            <div class="preview-area" id="previewArea" style="display: none;">
+              <img id="previewImage" src="" alt="预览">
+              <div class="preview-actions">
+                <button type="button" class="btn-recognize" id="recognizeBtn">
+                  <span>🔍</span> 识图
+                </button>
+                <button type="button" class="btn-remove" id="removeImage">✕</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 描述输入 -->
+          <div class="form-section">
+            <h3>描述/优化要求</h3>
+            <textarea id="userPrompt" class="prompt-input" rows="6" 
+              placeholder="文生图：描述你想生成的系统架构、流程或图表...&#10;图生图：描述你希望如何优化参考图片..."></textarea>
+            
+            <!-- 内容安全提示 -->
+            <div class="content-safety-hint">
+              <span class="safety-icon">🛡️</span>
+              <span class="safety-text">提示：请避免包含敏感、暴力、成人或其他违规内容，否则可能导致生成失败</span>
+            </div>
+            
+            <!-- 提示词增强按钮（文生图模式） -->
+            <div class="enhance-section" id="enhanceSection">
+              <button type="button" class="btn-enhance" id="enhanceBtn">
+                <span class="enhance-btn-icon">🧠</span>
+                <span class="enhance-btn-text">提示词增强</span>
+                <span class="enhance-btn-hint">AI 细化描述，提升生成质量</span>
+              </button>
+            </div>
+            
+            <!-- 附件上传（文生图模式） -->
+            <div class="attachment-section" id="attachmentSection">
+              <div class="attachment-upload" id="attachmentUpload">
+                <span class="attachment-icon">📎</span>
+                <span class="attachment-text">上传文档自动生成描述</span>
+                <span class="attachment-hint">支持 TXT、DOC、DOCX、PDF 格式</span>
+                <span class="attachment-limit">最大支持 30,000 字符（约 15,000 汉字）</span>
+              </div>
+              <input type="file" id="attachmentFile" accept=".txt,.doc,.docx,.pdf" style="display: none;">
+              <div class="attachment-preview" id="attachmentPreview" style="display: none;">
+                <div class="attachment-info">
+                  <span class="attachment-name" id="attachmentName"></span>
+                  <span class="attachment-size" id="attachmentSize"></span>
+                </div>
+                <button type="button" class="btn-remove-attachment" id="removeAttachment">✕</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 高级选项 -->
+          <div class="form-section">
+            <h3 class="collapsible" id="advancedToggle">
+              高级选项
+              <span class="toggle-icon">▼</span>
+            </h3>
+            <div class="advanced-options" id="advancedOptions" style="display: none;">
+              <div class="form-group">
+                <label>图片尺寸</label>
+<select id="imageSize">
+  <option value="2752x1536">16:9 宽屏 (2752×1536)</option>
+  <option value="2048x2048">1:1 方形 (2048×2048)</option>
+  <option value="2496x1664">3:2 横版 (2496×1664)</option>
+  <option value="1664x2496">2:3 竖版 (1664×2496)</option>
+  <option value="2368x1760">4:3 横版 (2368×1760)</option>
+  <option value="1760x2368">3:4 竖版 (1760×2368)</option>
+</select>
+              </div>
+              <div class="form-group">
+                <label>输出格式</label>
+                <select id="outputFormat">
+                  <option value="png">PNG 图片</option>
+                  <option value="svg">SVG 矢量图（可导入 VISIO）</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="showAnalysis">
+                  显示 AI 分析过程
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 提交按钮 -->
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submitBtn">
+              <span class="btn-text">⚡ 生成图像</span>
+              <span class="btn-loading" style="display: none;">
+                <span class="spinner"></span>
+                正在生成...
+              </span>
+            </button>
+          </div>
+        </form>
+      </section>
+      
+      <!-- 结果展示页 -->
+      <section class="page" id="page-result" style="display: none;">
+        <div class="page-header">
+          <h2>生成结果</h2>
+          <button class="btn-back" id="backBtn">← 返回</button>
+        </div>
+        
+        <div class="result-content">
+          <div class="result-image-container">
+            <img id="resultImage" src="" alt="生成结果">
+            <div class="result-actions">
+              <button class="btn-secondary" id="downloadBtn">💾 下载图片</button>
+              <button class="btn-secondary" id="cloneBtn">🔄 再生成一张</button>
+            </div>
+          </div>
+          
+          <div class="result-info">
+            <div class="info-card">
+              <h3>生成信息</h3>
+              <div class="info-row">
+                <span class="label">模式</span>
+                <span class="value" id="infoMode">-</span>
+              </div>
+              <div class="info-row">
+                <span class="label">尺寸</span>
+                <span class="value" id="infoSize">-</span>
+              </div>
+              <div class="info-row">
+                <span class="label">生成时间</span>
+                <span class="value" id="infoTime">-</span>
+              </div>
+            </div>
+            
+            <div class="info-card" id="analysisCard" style="display: none;">
+              <h3>🔍 AI 架构分析（图生图第一阶段）</h3>
+              <div class="analysis-content" id="analysisContent"></div>
+              <div class="analysis-note" style="margin-top: 12px; padding: 8px; background: #f0f9ff; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                ℹ️ AI 先分析了参考图片的架构，然后基于分析结果生成了新图
+              </div>
+            </div>
+            
+            <div class="info-card">
+              <h3>最终 Prompt</h3>
+              <pre class="prompt-display" id="finalPrompt">-</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 历史记录页 -->
+      <section class="page" id="page-history" style="display: none;">
+        <div class="page-header">
+          <h2>历史记录</h2>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="empty-state">暂无历史记录</div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- 消息提示 -->
+  <div class="toast" id="toast" style="display: none;"></div>
+  
+  <!-- 提示词增强弹窗 -->
+  <div class="modal-overlay" id="enhanceModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🧠 提示词增强结果</h3>
+        <button type="button" class="modal-close" id="enhanceModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="enhance-result-section">
+          <label>AI 增强后的描述：</label>
+          <pre class="enhance-result-text" id="enhanceResultText"></pre>
+        </div>
+        <div class="enhance-model-info">
+          <span>使用模型：deepseek-v4-flash</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="enhanceRetryBtn">
+          <span>🔄 重新生成</span>
+        </button>
+        <button type="button" class="btn-secondary" id="enhanceCancelBtn">
+          <span>取消</span>
+        </button>
+        <button type="button" class="btn-primary" id="enhanceApplyBtn">
+          <span>✅ 采用此描述</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 识图结果弹窗 -->
+  <div class="modal-overlay" id="recognizeModal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>🔍 图片识别结果</h3>
+        <button type="button" class="modal-close" id="recognizeModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="recognize-result-section">
+          <label>AI 识别的图片内容描述：</label>
+          <pre class="recognize-result-text" id="recognizeResultText"></pre>
+        </div>
+        <div class="recognize-actions">
+          <button type="button" class="btn-enhance-in-modal" id="recognizeEnhanceBtn">
+            <span>🧠</span> 文字增强
+          </button>
+          <span class="recognize-hint">可对识别结果进行 AI 增强细化</span>
+        </div>
+        <div class="recognize-model-info">
+          <span>使用模型：sensenova-6.7-flash-lite</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="recognizeRetryBtn">
+          <span>🔄 重新识别</span>
+        </button>
+        <button type="button" class="btn-secondary" id="recognizeCancelBtn">
+          <span>取消</span>
+        </button>
+        <button type="button" class="btn-primary" id="recognizeApplyBtn">
+          <span>✅ 采用此描述</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 文档分析结果弹窗 -->
+  <div class="modal-overlay" id="documentModal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>📄 文档分析结果</h3>
+        <button type="button" class="modal-close" id="documentModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="document-summary-section">
+          <label>📋 文档内容摘要：</label>
+          <pre class="document-summary-text" id="documentSummaryText"></pre>
+        </div>
+        <div class="document-prompt-section">
+          <label>🎨 生成的架构图提示词：</label>
+          <pre class="document-prompt-text" id="documentPromptText"></pre>
+        </div>
+        <div class="document-model-info">
+          <span>使用模型：deepseek-v4-flash</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="documentRetryBtn">
+          <span>🔄 重新分析</span>
+        </button>
+        <button type="button" class="btn-secondary" id="documentCancelBtn">
+          <span>取消</span>
+        </button>
+        <button type="button" class="btn-primary" id="documentApplyBtn">
+          <span>✅ 采纳此提示词</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
